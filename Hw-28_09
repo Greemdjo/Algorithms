@@ -1,1 +1,103 @@
+Способ 01
+#include <iostream>
+using namespace std;
+
+template <typename T>
+struct Node {
+	T data;
+	Node* next;
+	Node(T value) : data(value), next(nullptr) {}
+};
+
+template <typename T>
+class Stack_m {
+private:
+	Node<T>* top;
+	int size;
+
+public:
+	Stack_m() : top(nullptr), size(0) {}
+
+	void push(T value) {
+		Node<T>* newNode = new Node<T>(value);
+		newNode->next = top;
+		top = newNode;
+		size++;
+	}
+
+	T pop() {
+		if (isEmpty()) {
+			throw runtime_error("Stack is empty");
+		}
+		
+		Node<T>* temp = top;
+		T value = top->data;
+		top = top->next;
+		delete temp;
+		size--;
+		return value;
+	}
+	
+	T peek() {
+		if (isEmpty()) {
+			throw runtime_error("Stack is empty");
+		}
+		return top->data;
+	}
+
+	bool isEmpty() {
+		return top == nullptr;
+	}
+
+	int getSize() {
+		return size;
+	}
+
+	void clear() {
+		while (!isEmpty()) {
+			pop();
+		}
+	}
+	~Stack_m() { clear(); }
+};
+
+Способ 02
+#include<iostream>
+#include<algorithm>
+
+#ifndef STACK_M
+#define STACK_M
+
+template<typename T>
+class Stack_l {
+public:
+	Stack_m();
+	Stack_m(const Stack_m& other);
+	Stack_m(Stack_m&& other);
+	~Stack_m();
+
+	bool empty();
+	void push(const T& value);
+	void push(T&& value);
+	void pop();
+	const T& top() const;
+	T& top();
+	size_t size() const;
+	size_t get_capacity() const;
+
+private:
+	struct Node {
+		T val;
+		NOde* next;
+	};
+
+	size_t size_;
+	Node* top_;
+};
+
+#endif
+
+
+
+
 
