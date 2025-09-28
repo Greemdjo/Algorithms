@@ -60,7 +60,7 @@ public:
 	}
 	~Stack_m() { clear(); }
 };
-
+//########################################################
 Способ 02
 #include<iostream>
 #include<algorithm>
