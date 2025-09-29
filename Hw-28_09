@@ -96,6 +96,21 @@ private:
 };
 
 #endif
+///////////////////////////////////////////////
+#include<iostream>
+using namespace std;
+int The_AverageValue(int a, int b, int c) {
+	int sum = a + b + c;
+	int znak = ((sum >= 0) ? 1 : -1);
+	return (sum + znak * 1) / 3;
+}
+int main() {
+	int a, b, c;
+	cin >> a >> b >> c;
+	cout << The_AverageValue(a, b, c);
+
+}
+
 
 
 
