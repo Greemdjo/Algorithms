@@ -112,7 +112,40 @@ int main() {
 }
 
 
+#include<iostream>
+#include<vector>
+#include<algorithm>
+using namespace std;
+int The_AverageValue(int a, int b, int c) {
+	int sum = a + b + c;
+	int znak = ((sum >= 0) ? 1 : -1);
+	return (sum + znak * 1) / 3;
+}
+bool A_sufficientCondition_for_the_existence_of_a_polygon(vector<int>& arr, long sum){
+	return (2 * *max_element(arr.begin(), arr.end()) < sum);
 
+}
+int main() {
+	/*Задача о ср_знач
+	int a, b, c;
+	cin >> a >> b >> c;
+	cout << The_AverageValue(a, b, c);
+	*/
+
+	/*Задача о существовании многоугольника*/
+	int n;
+	bool flag = true;
+	long sum=0;
+	cin >> n;
+	vector<int> arr(n);
+	for (int i = 0; i < n; i++) {
+		cin >> arr[i];
+		if (arr[i] < 0) flag = false;
+		sum += arr[i];
+	}
+	if (flag != false || arr.size() < 3) cout << "False";
+	else cout << A_sufficientCondition_for_the_existence_of_a_polygon(arr, sum);
+}
 
 
 
