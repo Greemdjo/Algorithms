@@ -1,0 +1,63 @@
+
+#include <iostream>
+#include <stack>
+
+template <typename stack_t>                             //Создаю шаблон класса
+void extract_min(stack_t& st1, stack_t& st2) {          // функция дял выталкивания минимума с сохранением порядка оставшихся
+    if (st1.empty()) return;                            //Если стек -пуст, то делать нечего
+
+    stack_t st_temporal;                                //стек-временный
+    typename stack_t::value_type min_val = st1.top();   //выталкиваем вершину стека как минимум
+    while (!st1.empty()) {                              // нацеливаемся пройтись по всему стеку
+        if (st1.top() < min_val) {                      // смотрим а новая вершина стека меньше или больше
+            min_val = st1.top();                        // если да, то опять ее выталкиваем
+        }
+        st_temporal.push(st1.top());                    //сохраняем все элементы во временном стеке
+        st1.pop();                                      // выталкиваем элемент
+    }
+
+    bool min_extracted = false;                         //наш флаг девственности
+    while (!st_temporal.empty()) {                      // нацеливаемся на конец временного массива
+        if (!min_extracted && st_temporal.top() == min_val) {   // Если флаг не трушный и элемент временного стека это наш минимум
+            st2.push(st_temporal.top());                // опускаем наш элемент в наш новый старый стек                        
+            min_extracted = true;                       // то делаем наш флаг трушным
+        }
+        else {
+            st1.push(st_temporal.top());                // просто забираем елемент
+        }           
+        st_temporal.pop();                              //переходим к след елементу
+    }
+}
+
+int main() {
+    setlocale(LC_ALL, "Russian");
+    std::stack<int> st1;
+    std::stack<int> st2;
+
+    st1.push(9);
+    st1.push(8);
+    st1.push(7);
+    st1.push(6);
+    st1.push(5);
+    st1.push(3);
+    st1.push(3);
+    st1.push(2);
+    st1.push(10);
+
+    extract_min(st1, st2);
+
+    std::cout << "Минимальный элемент: ";
+    if (!st2.empty()) {
+        std::cout << st2.top() << std::endl;
+    }
+
+    std::cout << "Остальные элементы в исходном стеке (сверху вниз): ";
+    while (!st1.empty()) {
+        std::cout << '\n';
+        std::cout << st1.top();
+        st1.pop();
+    }
+    std::cout << std::endl;
+
+    return 0;
+}
