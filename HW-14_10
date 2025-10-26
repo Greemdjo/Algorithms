@@ -78,6 +78,137 @@ int main() {
     cout << "Замените скобку под индексом " << result << " на противоположную" << endl;
 }
 
+//Задание2
+#include <iostream>
+#include <stack>
+using namespace std;
+
+void STACKS(stack<int>& stk, stack<int>& stkL, stack<int>& stkE, stack<int>& stkM) {
+    while (!stkM.empty()) {
+        stk.push(stkM.top());
+        stkM.pop();
+    }
+    while (!stkE.empty()) {
+        stk.push(stkE.top());
+        stkE.pop();
+    }
+    while (!stkL.empty()) {
+        stk.push(stkL.top());
+        stkL.pop();
+    }
+}
+
+void Sort_stack(stack<int>& stk) {
+    if (stk.size() <= 1) return;
+
+    int pivot = stk.top();
+    stk.pop();
+
+    stack<int> stkL; 
+    stack<int> stkE; 
+    stack<int> stkM; 
+
+    stkE.push(pivot);
+
+
+    while (!stk.empty()) {
+        int current = stk.top();
+        stk.pop();
+
+        if (current < pivot) {
+            stkL.push(current);
+        }
+        else if (current > pivot) {
+            stkM.push(current);
+        }
+        else {
+            stkE.push(current);
+        }
+    }
+
+    // Рекурсивно сортируем стек с меньшими элементами
+    Sort_stack(stkL);
+    // Рекурсивно сортируем стек с большими элементами
+    Sort_stack(stkM);
+
+    // Объединяем стеки в правильном порядке
+    STACKS(stk, stkL, stkE, stkM);
+}
+
+
+template <typename T>
+void Distribution_referenceElement(stack<T>& stk) {
+    if (stk.size() <= 1) return;
+
+    T pivot = stk.top();
+    stk.pop();
+
+    stack<T> stkL, stkE, stkM;
+    stkE.push(pivot);
+
+    while (!stk.empty()) {
+        T current = stk.top();
+        stk.pop();
+
+        if (current < pivot) {
+            stkL.push(current);
+        }
+        else if (current > pivot) {
+            stkM.push(current);
+        }
+        else {
+            stkE.push(current);
+        }
+    }
+
+    Distribution_referenceElement(stkL);
+    Distribution_referenceElement(stkM);
+
+    // Объединяем в правильном порядке: меньшие -> равные -> большие
+    while (!stkL.empty()) {
+        stk.push(stkL.top());
+        stkL.pop();
+    }
+    while (!stkE.empty()) {
+        stk.push(stkE.top());
+        stkE.pop();
+    }
+    while (!stkM.empty()) {
+        stk.push(stkM.top());
+        stkM.pop();
+    }
+}
+
+// Функция для вывода стека
+void print_stack(stack<int> stk) {
+    cout << "Стек (сверху вниз): ";
+    while (!stk.empty()) {
+        cout << stk.top() << " ";
+        stk.pop();
+    }
+    cout << endl;
+}
+
+int main() {
+    setlocale(A)
+    int n, a;
+    cout << "Введите количество элементов: ";
+    cin >> n;
+
+    stack<int> stk;
+    cout << n;
+    for (int i = 0; i < n; i++) {
+        cin >> a;
+        stk.push(a);
+    }
+
+    print_stack(stk);
+    Sort_stack(stk);
+    print_stack(stk);
+
+    return 0;
+}
+
 
 //Задание 3
 #include <iostream>
