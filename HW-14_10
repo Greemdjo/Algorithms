@@ -1,0 +1,128 @@
+//Задание1
+#include <iostream>
+#include <stack>
+#include <string>
+#include<vector>
+#include<algorithm>
+using namespace std;
+
+char opposite(char c) {
+    if (c == '(') return ')';
+    if (c == ')') return '(';
+    if (c == '[') return ']';
+    if (c == ']') return '[';
+    if (c == '{') return '}';
+    if (c == '}') return '{';
+    return c; 
+}
+
+void Checking_theCorrectStructure(stack<pair<char, int>>& Stk, const string& str) {
+    if (!str.empty()) {
+        Stk.push({ str[0], 0 });
+    }
+    for (size_t i = 1; i < str.size(); ++i) {
+        if (!Stk.empty()) {
+            char top = Stk.top().first;
+            if ((top == str[i] - 1) || (top == str[i] - 2)) { 
+                Stk.pop();
+            }
+            else {
+                Stk.push({ str[i], i });
+            }
+        }
+        else {
+            Stk.push({ str[i], i });
+        }
+    }
+}
+
+bool is_PSS(const string& s) {
+    stack<pair<char, int>> Stk;
+    Checking_theCorrectStructure(Stk, s);
+    return Stk.empty();
+}
+
+int findUnbalancedIndex(const string& str) {
+    stack<pair<char, int>> Stk;
+    Checking_theCorrectStructure(Stk, str);
+
+   
+    if (Stk.empty()) {
+        return -1;
+    }
+
+    vector<int> unbalancedIndices;
+    while (!Stk.empty()) {
+        unbalancedIndices.push_back(Stk.top().second);
+        Stk.pop();
+    }
+
+    for (int idx : unbalancedIndices) {
+        char orig = str[idx];
+        char opp = opposite(orig);
+        string temp = str;
+        temp[idx] = opp;
+        if (is_PSS(temp)) {
+            return idx;
+        }
+    }
+}
+
+int main() {
+    
+    setlocale(LC_ALL, "RUS");
+    string str;
+    getline(cin, str);
+
+    int result = findUnbalancedIndex(str);
+    cout << "Замените скобку под индексом " << result << " на противоположную" << endl;
+}
+
+
+//Задание 3
+#include <iostream>
+#include<vector>
+#include<algorithm>
+using namespace std;
+bool atLeastHalf(vector<int>& arr, int n) {
+    return (2 * count(arr.begin(), arr.end(), arr[(n + 1) / 2]) >= n);
+}
+bool more30Percent(vector<int>& arr, int n) {
+    vector<int> arr_uniq = arr;
+    auto val = unique(arr_uniq.begin(), arr_uniq.end());
+    arr_uniq.erase(val, arr_uniq.end());
+    bool flag = false;
+    for (int elem : arr_uniq) {
+        if (3 * count(arr.begin(), arr.end(), elem) > n) {
+            flag = true;
+            break;
+        }
+    }
+    return flag;
+}
+bool atLeast31Percent(vector<int>& arr, double n) {
+    vector<int> arr_uniq = arr;
+    auto val = unique(arr_uniq.begin(), arr_uniq.end());
+    arr_uniq.erase(val, arr_uniq.end());
+    bool flag = false;
+    for (int elem : arr_uniq) {
+        if (count(arr.begin(), arr.end(), elem) > 0.31 * n) {
+            flag=true;
+            break;
+        }
+    }
+    return flag;
+}
+int main() {
+	int n;
+	cin >> n;
+	vector<int> arr(n);
+	for (int i = 0; i < n; i++) cin >> arr[i];
+
+	sort(arr.begin(), arr.end());
+
+	cout << (atLeastHalf(arr, n) ? "YES" : "NO") << " " << (more30Percent(arr, n) ? "YES" : "NO") << " " << (atLeast31Percent(arr, n) ? "YES" : "NO");
+    //1 2 3 4 4 5 5 5 5 5 5 6
+    /*7 3 0 3 9 1 4 2 3 6 8 3 7 0 3 5 1 3 9 2 3 4 7 3 6 0 3 8 1 3 2 5 3 9 4 3 7 1 3 0 6 3 2 8 3 4 5 3
+    1 7 3 9 3 0 6 2 8 3 4 5 3 1 7 3 9 0 3 2 4 3 6 1 3 8 5 3 7 2 3 0 9 3 6 4 3 1 8 3 5 7 3 2 0 3 9 1 3 4 3 6*/
+}
