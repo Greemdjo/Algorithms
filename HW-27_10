@@ -150,3 +150,103 @@ int main() {
 3 3
 2 4
 */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*Решали на паре
+#include <algorithm>
+#include <iostream>
+#include <vector>
+#include <numeric>
+
+using namespace std;
+
+struct box {
+	double wi, he;
+};
+
+template<typename Iter>
+double max_hidden_box(Iter first, Iter last) {
+
+		if (first == last) return 0.0;
+		auto it = min_element(first, last, [](auto a, auto b) {return a.he < b.he; });
+		double minsq = it->he * accumulate(first, last, 0.0, [](double s, box b)
+			{ return s + b.wi; });
+		double maxleft = max_hidden_box(first, it);
+		double maxright = max_hidden_box(it+1, last);
+		return max({ minsq, maxleft, maxright });
+}
+
+
+struct point {
+	double x, y;
+	point operator-(const point& p) const { return { x - p.x,y - p.y }; };
+	double norm2() const { return x * x + y * y; }
+	bool operator<(const point& p)
+	{
+		auto cross = x * p.y - y * p.x;
+		return cross > 0 || abs(cross) < 1E-9 && norm2() < p.norm2();
+	}
+};
+
+pair<vector<int>, vector<int>> convex_Hull(const vector<point>& p)
+{
+	if (p.size() < 3) return { {0,1}, {} };
+	vector<int> idx(p.size());
+	iota(begin(idx), end(idx), 0);
+	auto it = min_element(begin(idx), end(idx), [&p](auto a, auto b)
+		{return p[a].y < p[b].y || p[a].y == p[b].y && p[a].x < p[b].x; });
+	sort(begin(idx) + 1, end(idx), [&](auto a, auto b)
+		{return p[a] - p[idx[0]] < p[b] - p[idx[0]]; });
+	iter_swap(begin(idx), it);
+	vector<int> cv{ idx[0], idx[1] }, noncv;
+	for (int i = 2; i < p.size(); i++) {
+		while (p[idx[i]] - p[cv.back()] < p[cv.back()] - p[cv[cv.back() - 2]]) {
+			noncv.push_back(cv.back());
+			cv.pop_back();
+		}
+
+		cv.push_back(idx[i]);
+	}
+
+	return { move(cv), move(noncv) };
+}
+
+int main() {
+	auto [cv, noncv] = convex_Hull({ {0,2}, {1,1}, {2,2}, {2,0}, {3,3}, {2,4}, {4,3}, {4,5}, {5,4}, {4,1} });
+	for (auto p : cv) {
+		cout << p << " " << endl;
+	}
+
+	for (auto p : noncv) {
+		cout << p << " " << endl;
+	}
+
+
+}
+*/
