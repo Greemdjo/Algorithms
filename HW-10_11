@@ -1,0 +1,114 @@
+#include<iostream>
+#include<vector>
+#include<string>
+#include <algorithm>  // для find_if
+#include <cctype>     // для isdigit, isalpha, isalnum, isspace
+using namespace std;
+enum lexem_t {
+	constants, //константы
+	variables, //переменные
+	operators, //операторы
+	functions, //функции
+	open_brackets, //откр_скобки
+	close_brackets //закр_скобки
+};
+struct lexem {
+	string value;
+	lexem_t type;
+};
+
+bool is_operator(const char& s) {
+	return s == '+' || s == '-' || s == '*' || s == '/';
+}
+
+bool is_number(const char& s) {
+	return isdigit(s) || s=='.';
+}
+
+void print_lexem(const vector<lexem>& result) {
+	for (const auto& elem : result) {
+		cout << "'" << elem.value << "'" <<  " - ";
+		switch (elem.type) {
+			case constants: cout << "constants"; break;
+			case variables: cout << "variables"; break;
+			case operators: cout << "operators"; break;
+			case functions: cout << "functions"; break;
+			case open_brackets: cout << "open_brackets"; break;
+			case close_brackets: cout << "close_brackets"; break;
+		}
+		cout << endl;
+	}
+}
+
+vector<lexem> parse_expression(const string& str) {
+	
+	vector<lexem> result;
+	auto a = str.begin();
+
+	while (a != str.end()) {
+		a = find_if(a, str.end(),
+			[](char c) {return !isspace(c); });
+		if (a == str.end()) break;
+		lexem token;
+		
+		if (is_number(*a) || *a == '.') {
+			string str_digit;
+
+			while (a != str.end() && is_number(*a)) {
+				str_digit += *a;
+				a++;
+			}
+			token.value = str_digit;
+			token.type = constants;
+		}
+
+		else if ( isalpha(*a)) {
+			string str_alpha;
+			bool flag = false;
+			while (a != str.end() && (isalnum(*a) || *a=='_')) {
+				str_alpha += *a;
+				a++;
+			}
+			
+			auto l = a;
+			while (l != str.end() && isspace(*l)) {
+				l++;
+			}
+			if (l != str.end() && *l == '(') {
+				flag = true;
+			}
+
+			token.value = str_alpha;
+			token.type = flag ? functions : variables;
+		}
+
+		else if (*a == '(' || *a == ')') {
+			if (*a == '(') {
+				token.value = string(1,'(');
+				token.type = open_brackets;
+			}
+			else { 
+				token.value = string(1, ')' );
+				token.type = close_brackets;
+			}
+			a++;
+		}
+
+		else if (is_operator(*a)) {
+			token.value = string(1,*a);
+			token.type = operators;
+			a++;
+		}
+
+		result.push_back(token);
+	}
+	return result;
+}
+int main() {
+	string str;
+	getline(cin, str);
+	cout << endl;
+
+	vector<lexem> result = parse_expression(str);
+	print_lexem(result);
+}
