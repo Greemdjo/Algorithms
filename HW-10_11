@@ -1,114 +1,264 @@
 #include<iostream>
 #include<vector>
 #include<string>
-#include <algorithm>  // для find_if
-#include <cctype>     // для isdigit, isalpha, isalnum, isspace
+#include <algorithm>  
+#include <cctype> 
+#include <set>
+#include <cmath>
 using namespace std;
-enum lexem_t {
-	constants, //константы
-	variables, //переменные
-	operators, //операторы
-	functions, //функции
-	open_brackets, //откр_скобки
-	close_brackets //закр_скобки
-};
-struct lexem {
-	string value;
-	lexem_t type;
-};
+//Number1
+	enum lexem_t {
+		constants, //константы
+		variables, //переменные
+		operators, //операторы
+		functions, //функции
+		open_brackets, //откр_скобки
+		close_brackets //закр_скобки
+	};
+	struct lexem {
+		string value;
+		lexem_t type;
+	};
 
-bool is_operator(const char& s) {
-	return s == '+' || s == '-' || s == '*' || s == '/';
-}
+	bool is_operator(const char& s) {
+		return s == '+' || s == '-' || s == '*' || s == '/';
+	}
 
-bool is_number(const char& s) {
-	return isdigit(s) || s=='.';
-}
+	bool is_number(const char& s) {
+		return isdigit(s) || s == '.';
+	}
 
-void print_lexem(const vector<lexem>& result) {
-	for (const auto& elem : result) {
-		cout << "'" << elem.value << "'" <<  " - ";
-		switch (elem.type) {
+	void print_lexem(const vector<lexem>&result) {
+		for (const auto& elem : result) {
+			cout << "'" << elem.value << "'" << " - ";
+			switch (elem.type) {
 			case constants: cout << "constants"; break;
 			case variables: cout << "variables"; break;
 			case operators: cout << "operators"; break;
 			case functions: cout << "functions"; break;
 			case open_brackets: cout << "open_brackets"; break;
 			case close_brackets: cout << "close_brackets"; break;
+			}
+			cout << endl;
 		}
-		cout << endl;
 	}
-}
 
-vector<lexem> parse_expression(const string& str) {
+	vector<lexem> parse_expression(const string & str) {
+
+		vector<lexem> result;
+		auto a = str.begin();
+
+		while (a != str.end()) {
+			a = find_if(a, str.end(),
+				[](char c) {return !isspace(c); });
+			if (a == str.end()) break;
+			lexem token;
+
+			if (is_number(*a) || *a == '.') {
+				string str_digit;
+
+				while (a != str.end() && is_number(*a)) {
+					str_digit += *a;
+					a++;
+				}
+				token.value = str_digit;
+				token.type = constants;
+			}
+
+			else if (isalpha(*a)) {
+				string str_alpha;
+				bool flag = false;
+				while (a != str.end() && (isalnum(*a) || *a == '_')) {
+					str_alpha += *a;
+					a++;
+				}
+
+				auto l = a;
+				while (l != str.end() && isspace(*l)) {
+					l++;
+				}
+				if (l != str.end() && *l == '(') {
+					flag = true;
+				}
+
+				token.value = str_alpha;
+				token.type = flag ? functions : variables;
+			}
+
+			else if (*a == '(' || *a == ')') {
+				if (*a == '(') {
+					token.value = string(1, '(');
+					token.type = open_brackets;
+				}
+				else {
+					token.value = string(1, ')');
+					token.type = close_brackets;
+				}
+				a++;
+			}
+
+			else if (is_operator(*a)) {
+				token.value = string(1, *a);
+				token.type = operators;
+				a++;
+			}
+
+			result.push_back(token);
+		}
+		return result;
+	}
 	
-	vector<lexem> result;
-	auto a = str.begin();
+	//Number2
+	typedef vector<double> Point;
 
-	while (a != str.end()) {
-		a = find_if(a, str.end(),
-			[](char c) {return !isspace(c); });
-		if (a == str.end()) break;
-		lexem token;
-		
-		if (is_number(*a) || *a == '.') {
-			string str_digit;
-
-			while (a != str.end() && is_number(*a)) {
-				str_digit += *a;
-				a++;
-			}
-			token.value = str_digit;
-			token.type = constants;
-		}
-
-		else if ( isalpha(*a)) {
-			string str_alpha;
-			bool flag = false;
-			while (a != str.end() && (isalnum(*a) || *a=='_')) {
-				str_alpha += *a;
-				a++;
-			}
-			
-			auto l = a;
-			while (l != str.end() && isspace(*l)) {
-				l++;
-			}
-			if (l != str.end() && *l == '(') {
-				flag = true;
-			}
-
-			token.value = str_alpha;
-			token.type = flag ? functions : variables;
-		}
-
-		else if (*a == '(' || *a == ')') {
-			if (*a == '(') {
-				token.value = string(1,'(');
-				token.type = open_brackets;
-			}
-			else { 
-				token.value = string(1, ')' );
-				token.type = close_brackets;
-			}
-			a++;
-		}
-
-		else if (is_operator(*a)) {
-			token.value = string(1,*a);
-			token.type = operators;
-			a++;
-		}
-
-		result.push_back(token);
+	double Coordin_diff(double a, double b) {
+		return b - a;
 	}
-	return result;
-}
-int main() {
-	string str;
-	getline(cin, str);
-	cout << endl;
 
-	vector<lexem> result = parse_expression(str);
-	print_lexem(result);
-}
+	bool collinear(const Point& a, const Point& b,const Point& c) {
+		int n = a.size();
+		vector<double> ab(n), ac(n);
+
+		for (int i = 0; i < n; i++) {
+			ab[i] = Coordin_diff(a[i], b[i]);
+			ac[i] = Coordin_diff(a[i], c[i]);
+		}
+
+		int no_zeroCoord = -1;
+		for (int i = 0; i < n; i++) {
+			if (fabs(ab[i]) > 1e-9) {
+				no_zeroCoord = i;
+				break;
+			}
+		}
+
+		if (no_zeroCoord == -1) return true;
+
+		double quality = (ac[no_zeroCoord] / ab[no_zeroCoord]);
+		for (int i = 0; i < n; i++) {
+			if (fabs(ac[i] - ab[i] * quality) > 1e-9) return false;
+		}
+		return true;
+	}
+
+	bool areAllCollinear(const vector<Point>& points) {
+		int n = points.size();
+		if (n <= 2) return true;
+
+		for (int i = 2; i < n; i++) {
+			if(!collinear(points[0], points[1], points[i]))
+				return false;
+		}
+		return true;
+	}
+
+	bool the_plane(const Point& a, const Point& b, const Point& c, const Point& X){
+		int n = a.size();
+		vector<double> ab(n), ac(n), aX(n);
+
+		for (int i = 0; i < n; i++) {
+			ab[i] = Coordin_diff(a[i], b[i]);
+			ac[i] = Coordin_diff(a[i], c[i]);
+			aX[i] = Coordin_diff(a[i], X[i]);
+		}
+
+		double maxDet = 0;
+		int k1 = -1;
+		int k2 = -1;
+
+		for (int i = 0; i < n; i++) {
+			for (int j = i + 1; j < n; j++) {
+				double deter = ab[i] * ac[j] - ac[i] * ab[j];
+				if (fabs(deter) > maxDet) {
+					maxDet = fabs(deter);
+					k1 = i;
+					k2 = j;
+				}
+			}
+		}
+
+		if (fabs(maxDet) < 1e-9) return false;
+
+		double first = (Coordin_diff(aX[k1] * ac[k2], aX[k2] * ac[k1]) / maxDet;
+		double second = (Coordin_diff(aX[k2] * ab[k1], aX[k1] * ab[k2]) / maxDet;
+
+		for (int i = 0; i < n; i++) {
+			if (fabs(aX[i] - (first * ab[i] + second * ac[i]))) return false;
+		}
+
+		return true;
+	}
+
+	int cntFlatFacets(const vector<Point>& points) {
+		int n = points.size();
+
+		if (n < 2) return 0;
+		if (areAllCollinear(points)) return 1;
+
+		set<vector<int>> facets;
+
+		vector<vector<bool>> inc(n, vector<bool>(n, false));
+		vector<bool> Pointeds_visit(n, false);
+
+		for (int i = 0; i < n; i++) {
+			for (int j = i + 1; j < n; j++) {
+				for (int k = j + 1; k < n; k++) {
+					if (!collinear(points[i], points[j], points[k])) {
+						vector<int> facet = { i, j, k };
+
+						for (int l = 0; l < n; l++) {
+							if (l == i || l == j || l == k) continue;
+							else if (the_plane(points[i], points[j], points[k], points[l])) {
+								facet.push_back(l);
+							}
+						}
+
+						sort(facet.begin(), facet.end());
+						facets.insert(facet);
+
+						for (int a : facet) {
+							Pointeds_visit[a] = true;
+							for (int b : facet) {
+								if (a < b) {
+									inc[a][b] = true;
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+		for (int i = 0; i < n; i++) {
+			for (int j = i + 1; j < n; j++) {
+				if (!inc[i][j]) {
+					facets.insert({ i, j });
+					Pointeds_visit[i] = true;
+					Pointeds_visit[j] = true;
+				}
+			}
+		}
+
+		for (int i = 0; i < n; i++) {
+			if (!Pointeds_visit[i]) {
+				facets.insert({ i });
+			}
+		}
+
+		return facets.size();
+	}
+	int main() {
+		/*задача1*/
+		{
+			string str;
+			getline(cin, str);
+			cout << endl;
+
+			vector<lexem> result = parse_expression(str);
+			print_lexem(result);
+		}
+		//*/
+		
+		//задача2
+		{}
+	}
+	
