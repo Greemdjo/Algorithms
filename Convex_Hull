@@ -1,0 +1,51 @@
+#include <iostream>
+#include <algorithm>
+#include <numeric>
+#include <vector>
+
+using namespace std;
+
+struct point {
+    double x, y;
+    point operator-(const point& p) const { return { x - p.x, y - p.y }; }
+    double norm2() const { return x * x + y * y; }
+    bool operator<(const point& p) const {
+        auto cross = x * p.y - y * p.x;
+        return cross > 0 || (abs(cross) < 1E-9 && norm2() < p.norm2());
+    }
+};
+
+pair<vector<int>, vector<int>> convex_hull(const vector<point>& p) {
+    if (p.size() < 3) return { {0,1},{} };
+    vector<int> idx(p.size());
+    iota(begin(idx), end(idx), 0);
+    auto it = min_element(begin(idx), end(idx), [&p](auto a, auto b) {
+        return p[a].y < p[b].y || (p[a].y == p[b].y && p[a].x < p[b].x);
+        });
+    iter_swap(begin(idx), it);
+    sort(begin(idx), end(idx), [&](auto a, auto b) {
+        return p[a] - p[idx[0]] < p[b] - p[idx[0]];
+        });
+    vector<int> cv{ idx[0],idx[1] }, noncv;
+    for (int i = 2; i < p.size(); ++i) {
+        while (cv.size() >= 2 && (p[idx[i]] - p[cv.back()]) < (p[cv.back()] - p[cv[cv.size() - 2]])) {
+            noncv.push_back(cv.back());
+            cv.pop_back();
+        }
+        cv.push_back(idx[i]);
+    }
+    return { move(cv), move(noncv) };
+}
+
+int main() {
+    auto result = convex_hull({ {0,2}, {1,1}, {2,2}, {2,0}, {3,3}, {2,4}, {4,3}, {4,5}, {5,4}, {4,1} });
+    vector<int> cv = result.first;
+    vector<int> noncv = result.second;
+    cout << "Convex_Hull: ";
+    for (auto p : cv)
+        cout << p << " ";
+    cout << endl << "Outside Convex_Hull: ";;
+    for (auto p : noncv)
+        cout << p << " ";
+    cout << endl;
+}
